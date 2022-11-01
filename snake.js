@@ -15,8 +15,7 @@ var tilesRoundedWidth = Math.floor(screenWidth / tileSize) - 1;
 var xPos = 0;
 var yPos = 0;
 
-var xPosE;
-var yPosE;
+var ediblesPos = [];
 
 var snakelength = 1;
 
@@ -34,10 +33,10 @@ var ctx, ctx2;
 
 var bgcolor = "#00001a";
 var snakecolor = "#000000";
-var ediblecolor = "#000000";
 
 var paused = false;
 var alive = false;
+var invincible = false;
 
 // sound
 const sounds = {
@@ -140,6 +139,15 @@ $(document).on("keydown", function(e) {
             paused = !paused;
             pause();
             break;
+        case 88:
+            superSnake();
+            break;
+        case 76:
+            superDuperSnake();
+            break;
+        case 73:
+            invincible = !invincible;
+            break;
     }
 });
 
@@ -174,6 +182,7 @@ function newGame() {
     pause();
 
     alive = true;
+    invincible = false;
 
     velocity = $("#geschwindigkeit").val();
     difficulty = $("#difficulty").val();
@@ -183,7 +192,6 @@ function newGame() {
 
     setTimeout(function () {
         update();
-        edible();
     }, 300);
     
     //var borderdiv = $('<div id="borderoverlay"></div>');
@@ -259,7 +267,7 @@ function update() {
                 // check if snake should die
                 if(collision(xPos, yPos)){
                     // if dieOnBorder true, snake will die on border collision
-                    if(dieOnBorder) death();
+                    if(dieOnBorder && !invincible) death();
                 }
                 
                 // wrap snake around
@@ -273,6 +281,11 @@ function update() {
                     yPos = tilesRoundedHeight - 1;
                 }
                 
+                // new food if nothing is left
+                if (ediblesPos.length < 1) {
+                    ediblesPos.push(newEdible());
+                }
+
                 drawSnake();
                 drawEd();
             }
@@ -325,16 +338,20 @@ function drawSnake() {
             }
         }
     }
-    
+
     // collision with food
-    if ((yPos == yPosE) && (xPos == xPosE)) {
-        snakelength++;
-        playSound(sounds.food);
-        snakecolor = avgcolor(snakecolor, ediblecolor);
-        edible();
+    for (var e = ediblesPos.length - 1; e >= 0; e--) {
+        if((yPos == ediblesPos[e][1]) && (xPos == ediblesPos[e][0])) {
+            snakelength++;
+            playSound(sounds.food);
+            snakecolor = avgcolor(snakecolor, ediblesPos[e][2]);
+
+            ediblesPos.splice(e, 1);
+        }
     }
     
     // collision with snake
+    if(invincible) { return; }
     for (var i = 0; i < (position.length - 1); i++) {
         if((position[i][0] == xPos) && (position[i][1] == yPos)) {
             death();
@@ -342,28 +359,42 @@ function drawSnake() {
     }
 }
 
-function edible() {
-    xPosE = Math.floor(Math.random() * ((tilesRoundedWidth - 1) - 0 + 1)) + 0;
-    yPosE = Math.floor(Math.random() * ((tilesRoundedHeight - 1) - 0 + 1)) + 0;
-
-    // console.log("edible: x( " + xPosE + " ), y( " + yPosE + " )");
-
-    ediblecolor = $.xcolor.random();
+function superSnake() {
+    if(paused || !alive) {
+        return;
+    }
+    for(var i = 0; i < 5; i++) {
+        ediblesPos.push(newEdible());
+    }
 }
 
-var edibleDistanz = 2;
+function superDuperSnake() {
+    if(paused || !alive) {
+        return;
+    }
+    for(var i = 0; i < tilesRoundedWidth; i++) {
+        for(var j = 0; j < tilesRoundedHeight; j++) {
+            ediblesPos.push(newEdible([i, j]));
+        }
+    }
+}
 
-function drawEd() {
-    var altX = xPosE;
-    var altY = yPosE;
-    
+function newEdible(pos) {
+    var color = $.xcolor.random();
+    if(pos) {return [pos[0], pos[1], color];}
+    var xPos = Math.floor(Math.random() * ((tilesRoundedWidth - 1) - 0 + 1)) + 0;
+    var yPos = Math.floor(Math.random() * ((tilesRoundedHeight - 1) - 0 + 1)) + 0;
+    return [xPos, yPos, color];
+}
+
+function moveEd(xPosE, yPosE) {
+    var edibleDistanz = 2;
+
     // food movement probability
     var wannaMove;
     
     // difficulty
-    if(difficulty == 0) {
-        wannaMove = -1;
-    } else if(difficulty == 1) {
+    if(difficulty == 1) {
         wannaMove = 0.04;
     } else {
         wannaMove = 0.2
@@ -391,22 +422,26 @@ function drawEd() {
         }
     }
     
-    // remove old food if position has changed
-    if((altX != xPosE) || (altY != yPosE)) {
-        // console.log("Andere position: " + altX + " -> " + xPosE + " || " + altY + " -> " + yPosE);
-        ctx.clearRect(altX * tileSize, altY * tileSize, tileSize, tileSize);
+    return [xPosE, yPosE];
+}
+
+function drawEd() {
+    if(difficulty > 0) {
+        for (var j = 0; j < ediblesPos.length; j++) {
+            var newPos = moveEd(ediblesPos[j][0], ediblesPos[j][1]);
+            ctx.clearRect(ediblesPos[j][0] * tileSize, ediblesPos[j][1] * tileSize, tileSize, tileSize);
+            ediblesPos[j][0] = newPos[0];
+            ediblesPos[j][1] = newPos[1];
+        }
     }
-        
-    
-    // add new food
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(xPosE * tileSize, yPosE * tileSize, tileSize, tileSize);
-    ctx.fillStyle = $.xcolor.random();
-    ctx.fillRect(xPosE * tileSize, yPosE * tileSize, tileSize, tileSize);
-    ctx.fillStyle = ediblecolor;
-    ctx.fillRect((xPosE * tileSize) + 3, (yPosE * tileSize) + 3, tileSize - 6, tileSize - 6);
-    
-    
+    for (var i = 0; i < ediblesPos.length; i++) {
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(ediblesPos[i][0] * tileSize, ediblesPos[i][1] * tileSize, tileSize, tileSize);
+        ctx.fillStyle = $.xcolor.random();
+        ctx.fillRect(ediblesPos[i][0] * tileSize, ediblesPos[i][1] * tileSize, tileSize, tileSize);
+        ctx.fillStyle = ediblesPos[i][2];
+        ctx.fillRect((ediblesPos[i][0] * tileSize) + 3, (ediblesPos[i][1] * tileSize) + 3, tileSize - 6, tileSize - 6);
+    }
 }
 
 function collision(xPosition, yPosition) {
