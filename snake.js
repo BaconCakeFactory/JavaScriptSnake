@@ -39,6 +39,16 @@ var ediblecolor = "#000000";
 var paused = false;
 var alive = false;
 
+// sound
+const sounds = {
+    newgame: new Audio("music/mixkit-new-game.wav"),
+    food: new Audio("music/mixkit-food.wav"),
+    gameover: new Audio("music/mixkit-game-over.wav"),
+    pause: new Audio("music/mixkit-pause.wav"),
+}
+
+let volume = 0.6;
+
 // reposition overlays to center if window is resized
 window.addEventListener('resize', function(event) { center(); }, true);
 
@@ -142,10 +152,12 @@ function pause() {
     }
     if(!paused) {
         $("#pause").hide();
+        playSound(sounds.pause);
         return;
     }
     // center overlays
     $("#pause").show();
+    playSound(sounds.pause);
     center();
 }
 
@@ -167,6 +179,8 @@ function newGame() {
     difficulty = $("#difficulty").val();
     snakecolor = $.xcolor.random();
     
+    playSound(sounds.newgame);
+
     setTimeout(function () {
         update();
         edible();
@@ -315,6 +329,7 @@ function drawSnake() {
     // collision with food
     if ((yPos == yPosE) && (xPos == xPosE)) {
         snakelength++;
+        playSound(sounds.food);
         snakecolor = avgcolor(snakecolor, ediblecolor);
         edible();
     }
@@ -419,6 +434,8 @@ function death() {
     alive = false;
     pause();
 
+    playSound(sounds.gameover);
+
     if(snakelength > 1) { $("#punkte").text(snakelength.toString() + " Punkte"); }
     
     $("#borderoverlay").remove();
@@ -428,6 +445,13 @@ function newGameScreen() {
     location.reload();
 }
 
+function playSound(sound, loop=false, mult=1) {
+    const s = sound.cloneNode(true);
+    s.volume = volume * mult;
+    if (volume >= 1.5) { volume = 1; }
+    if (loop) { s.loop = true; }
+    s.play();
+}
 
 function avgcolor(color1, color2) {
     var avg = function (a, b) {
