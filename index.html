@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+    <title>Snake - David Hermann</title>
+    <link rel="icon" href="https://david-hermann.com/wp-content/uploads/2021/09/cropped-iconnormred-32x32.png" sizes="32x32">
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+    <script src="https://www.einherzfuerhaie.de/12.10.19_Backup/res/jquery.xcolor.min.js"></script>
+    <script src="snake.js"></script>
+
+    <link rel="stylesheet" href="snake.css">
+</head>
+
+<body>
+    <div id="screen" class="full-screen">
+        <div class="ol ol-style" id="ng">
+            <p>New Game</p>
+            
+            <label>Geschwindigkeit: </label>
+            <select id="geschwindigkeit">
+                <option value="300">Langsam</option>
+                <option value="100" selected>Normal</option>
+                <option value="70">Schnell</option>
+            </select><br>
+            
+            <label>Schwierigkeit: </label>
+            <select id="difficulty">
+                <option value="0">Leicht</option>
+                <option value="1" selected>Mittel</option>
+                <option value="2">Schwer</option>
+            </select><br>
+            
+            <label>Sterben wenn Rand berührt wird? </label>
+            <button type="button" id="dieOnBorder" style="color: black;">✔</button><br>
+
+            <label>Spur hinter der Schlange? </label>
+            <button type="button" id="trail">✔</button><br>
+            
+            <button onclick="newGame()">Spielen</button>
+        </div>
+        <div class="ol ol-style" id="go">
+            <p>Game Over</p>
+            <p id="punkte">1 Punkt</p>
+            <button onclick="newGameScreen()">Neuer Versuch</button>
+        </div>
+    </div>
+    <div id="pause" class="full-screen">
+        <div class="ol-style" id="pause-inner">
+            <p>- Paused -</p>
+            <p>press SPACE to continue!</p>
+        </div>
+    </div>
+    <canvas id="underGameCanvas" width="2000px" height="2000px"></canvas>
+    <canvas id="gameCanvas" width="2000px" height="2000px"></canvas>
+    
+    
+</body>
+
+</html>

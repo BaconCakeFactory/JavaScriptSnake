@@ -1,0 +1,91 @@
+html {
+    overflow: hidden;
+    font-family: arial;
+    color: green;
+}
+
+body {
+    margin: 0px;
+    background-color: darkblue;
+}
+
+.full-screen {
+    float: left;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    text-align: center;
+}
+
+.ol-style {
+    position: absolute;
+    padding: 0 1em 1em 1em;
+    border: 5px solid green;
+    line-height: 1.7em;
+    font-weight: 600;
+    font-size: 2em;
+}
+
+select, .checkbox {
+    width: auto;
+    height: 5%;
+    border: 4px solid green;
+    font-size: 0.7em;
+    color: green;
+    font-weight: 600;
+    background-color: black;
+    cursor: pointer;
+    margin-bottom: 3%;
+
+}
+
+input {
+    width: auto;
+    height: 6%;
+    border: 4px solid green;
+    font-size: 0.8em;
+    color: gray;
+    font-weight: 600;
+    background-color: black;
+    cursor: pointer;
+    margin-bottom: 3%;
+}
+
+button {
+    width: auto;
+    height: 5%;
+    border: 4px solid green;
+    font-size: 0.7em;
+    color: green;
+    font-weight: 600;
+    background-color: black;
+    cursor: pointer;
+    margin-bottom: 3%;
+}
+
+label {
+    font-size: 0.7em;
+}
+
+#gameCanvas, #underGameCanvas {
+    position: fixed;
+    margin: 5px auto auto 5px;
+}
+
+#underGameCanvas {
+    background-color: black;
+}
+
+#pause {
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+#pause-inner {
+    background-color: rgba(0, 0, 0, 0.9);
+}
